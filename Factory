@@ -1,0 +1,79 @@
+#include<iostream>
+using namespace std;
+
+class vehicle {
+public:
+	virtual void print() = 0;
+	static vehicle*  CreateVehicleFactory(int type) ;
+
+};
+
+class Car : public vehicle
+{
+public:
+	void print()
+	{
+		cout << "I am Car Factory" << endl;
+	}
+};
+
+class bike : public vehicle
+{
+public:
+	void print()
+	{
+		cout << "I am Bike Factory" << endl;
+	}
+};
+
+class Auto : public vehicle
+{
+public:
+	void print()
+	{
+		cout << "I am Auto Factory" << endl;
+	}
+};
+
+vehicle* vehicle::CreateVehicleFactory(int type)
+{
+	if(type == 0)
+		return new Car();
+	else if(type == 1)
+		return new bike();
+	else if(type == 2)
+		return new Auto();
+	else
+		return nullptr;
+	
+}
+
+class client {
+	vehicle* pVehicle;
+
+public:
+	client(int type)
+	{
+		pVehicle = vehicle::CreateVehicleFactory(type);
+	}
+	~client()
+	{
+		delete pVehicle;
+		pVehicle = nullptr;
+	}
+	vehicle* getVehicle()
+	{
+		return pVehicle;
+	}
+
+};
+
+int main()
+{
+	client c_ptr(1);
+	if (c_ptr.getVehicle())
+		c_ptr.getVehicle()->print();
+	else
+		cout << "No vehicle avaible" << endl;
+	return 0;
+}
