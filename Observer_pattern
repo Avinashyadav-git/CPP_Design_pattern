@@ -1,0 +1,97 @@
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+
+class DisplayObserver
+{
+public:
+	virtual void notifyObserver(int run, int wicket, double over) = 0;
+};
+
+class CurrentScoreDisplay : public DisplayObserver
+{
+public:
+	void notifyObserver(int run, int wicket, double over)
+	{
+		cout << "Current Score :" << endl;
+		cout << run << "/" << wicket << "(" << over << ")" << endl;
+	}
+};
+
+class AverageScoreDisplay : public DisplayObserver
+{
+public:
+	void notifyObserver(int run, int wicket, double over)
+	{
+		cout << "Average Score :" << endl;
+		cout << static_cast<double>(run/ over) << endl;
+	}
+};
+
+class CricketApp {
+public:
+	virtual void Addobserver(DisplayObserver*) = 0;
+	virtual void Removeobserver(DisplayObserver*) = 0;
+	virtual void notifyAll() = 0;
+};
+
+class CricketAppUtil : public CricketApp
+{
+	vector<DisplayObserver*>observerPool;
+	int run, wicket;
+	double over;
+public:
+	CricketAppUtil(int r = 0, int w=0, double o=0.0) :run(r), wicket(w), over(o) {};
+
+	virtual void Addobserver(DisplayObserver* p_DisplayObserver) {
+		observerPool.push_back(p_DisplayObserver);
+	}
+
+	virtual void Removeobserver(DisplayObserver* p_DisplayObserver) {
+		auto itr = find(observerPool.begin(), observerPool.end(), p_DisplayObserver);
+		if (itr != observerPool.end())
+			observerPool.erase(itr);
+	}
+	virtual void notifyAll() {
+	//	for (auto itr = observerPool.begin(); itr != observerPool.end(); itr++)
+		//	cout << itr._Getcont << endl;
+			//			(itr.data())->notifyObserver(run, wicket, over);
+		for (const auto itr : observerPool)
+		{
+		//	itr->notifyObserver(run, wicket, over);
+			itr->notifyObserver(run, wicket, over);
+			auto ptr = itr;
+		}
+		
+	}
+	void update(int r, int w, double o)
+	{
+		run = r;
+		wicket = w;
+		over = o;
+		notifyAll();
+	}
+
+
+};
+
+
+int main()
+{
+	CurrentScoreDisplay* c = new CurrentScoreDisplay();
+	AverageScoreDisplay* a = new AverageScoreDisplay();
+
+	CricketAppUtil* newApp = new CricketAppUtil();
+
+	newApp->Addobserver(c);
+	newApp->Addobserver(a);
+
+	newApp->update(100, 2, 20.0);
+
+	newApp->Removeobserver(a);
+
+	newApp->update(150, 5, 35.0);
+
+	return 0;
+}
